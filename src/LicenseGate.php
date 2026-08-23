@@ -1,6 +1,6 @@
 <?php
 
-namespace MarghoobSuleman\HashtagCmsLicense;
+namespace HashtagCms\LicenseClient;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -19,7 +19,7 @@ use Throwable;
  *
  * Usage in a package service provider:
  *
- *     use MarghoobSuleman\HashtagCmsLicense\LicenseGate;
+ *     use HashtagCms\LicenseClient\LicenseGate;
  *
  *     public function boot(): void
  *     {
@@ -281,7 +281,7 @@ class LicenseGate
             'public_key_path' => null,        // null => bundled resources/license/public.key
             'public_key' => null,             // or pass the PEM string directly
             'online_check' => true,
-            'server_url' => 'https://license.hashtagcms.org',
+            'server_url' => 'https://hashtagcms.org',
             'validate_endpoint' => '/api/hashtagcms/public/license/validate',
             'http_timeout' => 4,
             'cache_ttl' => 60 * 60 * 24,      // 24h

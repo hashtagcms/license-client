@@ -1,6 +1,6 @@
 <?php
 
-namespace MarghoobSuleman\HashtagCmsLicense;
+namespace HashtagCms\LicenseClient;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;

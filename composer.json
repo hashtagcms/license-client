@@ -7,8 +7,8 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Marghoob Suleman",
-            "email": "marghoobsuleman@gmail.com"
+            "name": "FollowCan Technologies Pvt. Ltd.",
+            "email": "support@hashtagcms.org"
         }
     ],
     "require": {
@@ -21,18 +21,18 @@
     },
     "autoload": {
         "psr-4": {
-            "MarghoobSuleman\\HashtagCmsLicense\\": "src/"
+            "HashtagCms\\LicenseClient\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "MarghoobSuleman\\HashtagCmsLicense\\Tests\\": "tests/"
+            "HashtagCms\\LicenseClient\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "MarghoobSuleman\\HashtagCmsLicense\\HashtagCmsLicenseServiceProvider"
+                "HashtagCms\\LicenseClient\\HashtagCmsLicenseServiceProvider"
             ]
         }
     },

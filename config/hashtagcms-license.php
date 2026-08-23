@@ -26,7 +26,7 @@ return [
 
     // Online revocation check against the license server.
     'online_check' => env('HASHTAGCMS_LICENSE_ONLINE_CHECK', true),
-    'server_url' => env('HASHTAGCMS_LICENSE_SERVER', 'https://license.hashtagcms.org'),
+    'server_url' => env('HASHTAGCMS_LICENSE_SERVER', 'https://hashtagcms.org'),
     'validate_endpoint' => env('HASHTAGCMS_LICENSE_VALIDATE_ENDPOINT', '/api/hashtagcms/public/license/validate'),
     'http_timeout' => 4,
 

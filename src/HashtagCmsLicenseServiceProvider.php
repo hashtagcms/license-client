@@ -1,6 +1,6 @@
 <?php
 
-namespace MarghoobSuleman\HashtagCmsLicense;
+namespace HashtagCms\LicenseClient;
 
 use Illuminate\Support\ServiceProvider;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace MarghoobSuleman\HashtagCmsLicense\Tests;
+namespace HashtagCms\LicenseClient\Tests;
 
 use Firebase\JWT\JWT;
-use MarghoobSuleman\HashtagCmsLicense\LicenseGate;
-use MarghoobSuleman\HashtagCmsLicense\LicenseValidator;
+use HashtagCms\LicenseClient\LicenseGate;
+use HashtagCms\LicenseClient\LicenseValidator;
 use PHPUnit\Framework\TestCase;
 
 /**

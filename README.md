@@ -1,6 +1,6 @@
 # HashtagCMS License Client
 
-Client SDK for the [HashtagCMS License Server](https://license.hashtagcms.org). Commercial
+Client SDK for the [HashtagCMS License Server](https://hashtagcms.org). Commercial
 HashtagCMS packages (e.g. `hashtagcms-sso`) depend on this library to **enforce their license**
 at runtime — it verifies a signed license key and refuses to run the package unless the key is
 genuine, entitles that package, is valid for the current domain, and hasn't been revoked.
@@ -26,7 +26,7 @@ Set the installation's key in `.env`:
 
 ```env
 HASHTAGCMS_PRO_LICENSE_KEY="eyJ0eXAi…"
-HASHTAGCMS_LICENSE_SERVER=https://license.hashtagcms.org
+HASHTAGCMS_LICENSE_SERVER=https://hashtagcms.org
 HASHTAGCMS_LICENSE_ONLINE_CHECK=true
 HASHTAGCMS_LICENSE_FAIL_OPEN=true          # keep working if the server is unreachable
 # HASHTAGCMS_LICENSE_PUBLIC_KEY_PATH=/abs/path/public.key   # else the bundled key is used
@@ -41,7 +41,7 @@ HASHTAGCMS_LICENSE_FAIL_OPEN=true          # keep working if the server is unrea
 In your package's service provider:
 
 ```php
-use MarghoobSuleman\HashtagCmsLicense\LicenseGate;
+use HashtagCms\LicenseClient\LicenseGate;
 
 public function boot(): void
 {
@@ -93,7 +93,7 @@ Only when all four pass does `passes()` return `true`.
 For a pure signature check without the gate policy:
 
 ```php
-use MarghoobSuleman\HashtagCmsLicense\LicenseValidator;
+use HashtagCms\LicenseClient\LicenseValidator;
 
 $payload = (new LicenseValidator($publicKeyPem))->validate($jwt); // array | false
 ```
@@ -108,4 +108,4 @@ Revocation reaches the client within `cache_ttl` (default 24h) after **Revoke** 
 
 ## License
 
-MIT © Marghoob Suleman
+MIT © FollowCan Technologies Pvt. Ltd.
