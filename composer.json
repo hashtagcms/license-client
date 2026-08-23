@@ -1,0 +1,44 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "hashtagcms/license-client",
+    "description": "Client SDK for the HashtagCMS License Server: verify RS256 license keys and gate commercial packages (signature, entitlement, domain binding, revocation).",
+    "type": "library",
+    "keywords": ["hashtagcms", "license", "licensing", "jwt", "client", "sdk"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marghoob Suleman",
+            "email": "marghoobsuleman@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "firebase/php-jwt": "^6.11 || ^7.0",
+        "illuminate/support": "^11.0 || ^12.0 || ^13.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5 || ^11.0 || ^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MarghoobSuleman\\HashtagCmsLicense\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MarghoobSuleman\\HashtagCmsLicense\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "MarghoobSuleman\\HashtagCmsLicense\\HashtagCmsLicenseServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
