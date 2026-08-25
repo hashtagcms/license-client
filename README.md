@@ -3,7 +3,8 @@
 Client SDK for the [HashtagCMS License Server](https://hashtagcms.org). Commercial
 HashtagCMS packages (e.g. `hashtagcms-sso`) depend on this library to **enforce their license**
 at runtime — it verifies a signed license key and refuses to run the package unless the key is
-genuine, entitles that package, is valid for the current domain, and hasn't been revoked.
+genuine, entitles that package, that package hasn't expired, is valid for the current domain, and
+hasn't been revoked.
 
 > This is the **client** half of the licensing system. The signing/issuing half (private key,
 > admin panel, API) lives in the license server app and is never shipped to customers.
@@ -65,7 +66,8 @@ if (! LicenseGate::allows('sso')) { /* degrade / nag */ }
 $gate = LicenseGate::for('sso');
 $gate->passes();     // bool
 $gate->reason();     // 'ok' | 'missing_license_key' | 'invalid_signature_or_expired'
-                     // | 'package_not_entitled' | 'domain_not_allowed' | 'revoked_or_inactive'
+                     // | 'package_not_entitled' | 'package_expired'
+                     // | 'domain_not_allowed' | 'revoked_or_inactive'
 $gate->payload();    // decoded license claims
 ```
 
@@ -82,11 +84,16 @@ LicenseGate::for('sso', [
 ## What the gate checks
 
 1. **Signature + expiry** — RS256 JWT verified against the bundled public key (offline, tamper-proof).
+   The token-level `exp` is the licence cap.
 2. **Package entitlement** — the license's `packages` claim contains the package name (or `*`).
-3. **Domain binding** — the current host matches `allowed_domains` (supports `*.example.com`).
-4. **Revocation** — a cached online call to `POST /api/hashtagcms/public/license/validate` catches revoked keys.
+3. **Per-package expiry** — the token's `package_expiry` claim (slug → expiry) lets a single key
+   carry packages that lapse on different dates; this package is refused once its own date passes,
+   even while other packages on the same key stay valid (offline).
+4. **Domain binding** — the current host matches `allowed_domains` (supports `*.example.com`).
+5. **Revocation** — a cached online call to `POST /api/hashtagcms/public/license/validate` catches
+   revoked keys and server-side per-package expiry.
 
-Only when all four pass does `passes()` return `true`.
+Only when all five pass does `passes()` return `true`.
 
 ## Low-level verifier
 

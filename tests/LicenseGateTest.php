@@ -140,6 +140,54 @@ class LicenseGateTest extends TestCase
         $this->assertTrue($this->gate('sso', $key, ['domain' => 'anything.example'])->passes());
     }
 
+    public function test_package_expired_fails_while_others_on_same_key_pass(): void
+    {
+        $key = $this->sign([
+            'packages' => ['commerce', 'booking_engine'],
+            'exp' => time() + 86400, // licence cap still valid
+            'package_expiry' => [
+                'commerce' => time() - 10,          // this package lapsed
+                'booking_engine' => time() + 3600,  // still valid
+            ],
+        ]);
+
+        $commerce = $this->gate('commerce', $key);
+        $this->assertFalse($commerce->passes());
+        $this->assertSame('package_expired', $commerce->reason());
+
+        $booking = $this->gate('booking_engine', $key);
+        $this->assertTrue($booking->passes());
+        $this->assertSame('ok', $booking->reason());
+    }
+
+    public function test_package_without_expiry_entry_is_governed_by_token_exp(): void
+    {
+        $key = $this->sign([
+            'packages' => ['sso', 'commerce'],
+            'exp' => time() + 3600,
+            'package_expiry' => ['commerce' => time() - 10], // only commerce carries a date
+        ]);
+
+        // sso has no per-package entry → not expired at this step
+        $this->assertTrue($this->gate('sso', $key)->passes());
+        // commerce lapsed
+        $commerce = $this->gate('commerce', $key);
+        $this->assertTrue($commerce->fails());
+        $this->assertSame('package_expired', $commerce->reason());
+    }
+
+    public function test_wildcard_entitlement_unaffected_by_unrelated_package_expiry(): void
+    {
+        $key = $this->sign([
+            'packages' => ['*'],
+            'exp' => time() + 3600,
+            'package_expiry' => ['commerce' => time() - 10],
+        ]);
+
+        // '*' grants sso; sso has no entry in the map, so it stays valid
+        $this->assertTrue($this->gate('sso', $key)->passes());
+    }
+
     public function test_validator_returns_payload_for_valid_key(): void
     {
         $key = $this->sign(['packages' => ['sso'], 'tier' => 'enterprise', 'exp' => time() + 3600]);

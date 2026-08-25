@@ -14,8 +14,9 @@ use Throwable;
  *
  *   1. Signature + expiry are valid   (offline, tamper-proof — via LicenseValidator)
  *   2. The key entitles this package  (the `packages` claim contains it, or "*")
- *   3. The key is bound to this domain (offline check against allowed_domains)
- *   4. The key is not revoked/inactive (online check against the license server, cached)
+ *   3. This package has not expired   (offline, per-package `package_expiry` claim)
+ *   4. The key is bound to this domain (offline check against allowed_domains)
+ *   5. The key is not revoked/inactive (online check against the license server, cached)
  *
  * Usage in a package service provider:
  *
@@ -82,8 +83,8 @@ class LicenseGate
 
     /**
      * Machine-readable reason for the last decision ('ok', 'missing_license_key',
-     * 'invalid_signature_or_expired', 'package_not_entitled', 'domain_not_allowed',
-     * 'revoked_or_inactive').
+     * 'invalid_signature_or_expired', 'package_not_entitled', 'package_expired',
+     * 'domain_not_allowed', 'revoked_or_inactive').
      */
     public function reason(): string
     {
@@ -119,12 +120,21 @@ class LicenseGate
             return $this->deny('package_not_entitled');
         }
 
-        // 3) Domain binding (offline).
+        // 3) Per-package expiry (offline). A single key may carry packages that
+        // expire on different dates; the server embeds a `package_expiry` map
+        // (slug => unix ts) in the token. The token-level `exp` (already checked
+        // in step 1) is the licence cap; this catches a package that lapsed
+        // earlier while others on the same key are still valid.
+        if ($this->packageExpired($payload)) {
+            return $this->deny('package_expired');
+        }
+
+        // 4) Domain binding (offline).
         if (!$this->domainAllowed($payload)) {
             return $this->deny('domain_not_allowed');
         }
 
-        // 4) Online revocation check (cached; fail-open on outage by default).
+        // 5) Online revocation check (cached; fail-open on outage by default).
         if ($this->config['online_check'] && !$this->onlineValid($key)) {
             return $this->deny('revoked_or_inactive');
         }
@@ -151,6 +161,33 @@ class LicenseGate
         }
 
         return '';
+    }
+
+    /**
+     * Offline per-package expiry check. The token's `package_expiry` claim maps
+     * package slug => effective expiry (unix ts). This package is expired only
+     * when it has an explicit entry whose time has passed; a package with no
+     * entry (perpetual, or governed solely by the token-level `exp`) never fails
+     * here. Wildcard ('*') entitlements have no per-package entry and so are
+     * governed by the token `exp` alone.
+     */
+    protected function packageExpired(array $payload): bool
+    {
+        $map = $payload['package_expiry'] ?? null;
+
+        if (empty($map)) {
+            return false;
+        }
+
+        // JWT decode yields a stdClass for the JSON object claim.
+        $map = (array) $map;
+        $exp = $map[$this->package] ?? null;
+
+        if ($exp === null) {
+            return false;
+        }
+
+        return time() > (int) $exp;
     }
 
     /**

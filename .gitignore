@@ -1,4 +1,18 @@
+# Dependencies
 /vendor/
 composer.lock
+
+# PHP tooling caches
 .phpunit.result.cache
+.phpunit.cache/
+.php-cs-fixer.cache
+/build/
+/coverage/
+
+# IDE / editors
+.idea/
+.vscode/
+*.iml
+
+# OS
 .DS_Store
